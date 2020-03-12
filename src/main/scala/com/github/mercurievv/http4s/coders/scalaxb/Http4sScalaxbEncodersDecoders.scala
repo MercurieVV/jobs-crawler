@@ -1,5 +1,7 @@
 package com.github.mercurievv.http4s.coders.scalaxb
 
+import cats.Monad
+import cats.implicits._
 import cats.effect.ConcurrentEffect
 import fs2.Chunk
 import org.http4s.headers.`Content-Type`
@@ -18,6 +20,7 @@ import scala.xml.NamespaceBinding
 object Http4sScalaxbEncodersDecoders {
   implicit def xmlDecoder[F[_], T](
     implicit format: XMLFormat[T],
+    F: Monad[F],
     C: ConcurrentEffect[F]
   ): EntityDecoder[F, T] = EntityDecoder.decodeBy(MediaType.application.xml) { decodeXml }
 
