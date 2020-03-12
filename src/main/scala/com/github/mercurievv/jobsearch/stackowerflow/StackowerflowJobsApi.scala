@@ -23,9 +23,9 @@ import com.github.mercurievv.http4s.coders.scalaxb.Http4sScalaxbEncodersDecoders
   * Time: 2:21 PM
   * Contacts: email: mercurievvss@gmail.com Skype: 'grobokopytoff' or 'mercurievv'
   */
-class StackowerflowJobs[F[_]](httpClient: Client[F])(implicit
-                              C: ConcurrentEffect[F]
-) {
+class StackowerflowJobsApi[F[_]](httpClient: Client[F])(
+  implicit
+  C: ConcurrentEffect[F]) {
   def getJobsRss: F[Rss] = {
     val target = uri"https://stackoverflow.com/jobs/feed?q=scala&r=true"
     httpClient.expect[Rss](target)
