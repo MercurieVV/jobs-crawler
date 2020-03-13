@@ -22,7 +22,7 @@ object Http4sScalaxbEncodersDecoders {
     implicit format: XMLFormat[T],
     F: Monad[F],
     C: ConcurrentEffect[F]
-  ): EntityDecoder[F, T] = EntityDecoder.decodeBy(MediaType.application.xml) { decodeXml }
+  ): EntityDecoder[F, T] = EntityDecoder.decodeBy(MediaType.application.xml) { decodeXml(_) }
 
   def decodeXml[T, F[_]](m: Media[F])(
     implicit format: XMLFormat[T],
