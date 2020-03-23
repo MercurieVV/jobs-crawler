@@ -3,7 +3,8 @@ import java.time.{ZoneId, ZonedDateTime}
 
 import cats.{Monad, MonoidK}
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder
+import com.amazonaws.services.dynamodbv2.model.AmazonDynamoDBException
+import com.amazonaws.services.dynamodbv2.{AmazonDynamoDBAsyncClientBuilder, AmazonDynamoDBClientBuilder}
 import com.github.mercurievv.jobsearch.model.{Company, Id, Job, JobsResource, Tag}
 import org.scanamo._
 import org.scanamo.syntax._
@@ -13,6 +14,7 @@ import org.http4s.Uri
 import org.scanamo.ops.ScanamoOpsT
 import shapeless.tag
 import shapeless.tag.@@
+import zio.IO
 
 /**
   * Created with IntelliJ IDEA.
@@ -24,13 +26,13 @@ import shapeless.tag.@@
 class DynamodbJobsStorage {
   private val client = {
     val conf = new EndpointConfiguration("http://localhost:8000", "us-east-1")
-    AmazonDynamoDBClientBuilder.standard().withEndpointConfiguration(conf).build()
+    AmazonDynamoDBAsyncClientBuilder.standard().withEndpointConfiguration(conf).build()
   }
-  private val scanamo = Scanamo(client)
+  private val scanamo = ScanamoZio(client)
 
   private val table = Table[Job]("Jobs")
 
-  def putNewJobs(jobsResource: JobsResource, jobs: Set[Job]): Seq[Either[DynamoReadError, Job]] = {
+  def putNewJobs(jobsResource: JobsResource, jobs: Set[Job]): IO[AmazonDynamoDBException, List[Either[DynamoReadError, Job]]] = {
     val jobsFromOneResource = jobs.filter(_.jobsResource == jobsResource)
     val op = for {
       lastItem <- table
