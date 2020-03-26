@@ -1,20 +1,17 @@
 package com.github.mercurievv.jobsearch.persistence
 import java.time.{ZoneId, ZonedDateTime}
 
-import cats.{Monad, MonoidK}
-import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
+import cats.kernel.Eq
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDBAsync
 import com.amazonaws.services.dynamodbv2.model.AmazonDynamoDBException
-import com.amazonaws.services.dynamodbv2.{AmazonDynamoDBAsyncClientBuilder, AmazonDynamoDBClientBuilder}
-import com.github.mercurievv.jobsearch.model.{Company, Id, Job, JobsResource, Tag}
+import com.github.mercurievv.jobsearch.AIO
+import com.github.mercurievv.jobsearch.businesslogic.JobsStorage
+import com.github.mercurievv.jobsearch.model.{Job, JobsResource}
+import fs2._
 import org.scanamo._
-import org.scanamo.syntax._
 import org.scanamo.generic.auto._
-import com.amazonaws.services.dynamodbv2.model.ScalarAttributeType._
-import org.http4s.Uri
-import org.scanamo.ops.ScanamoOpsT
-import shapeless.tag
-import shapeless.tag.@@
 import zio.IO
+import zio.interop.catz._
 
 /**
   * Created with IntelliJ IDEA.
@@ -23,26 +20,35 @@ import zio.IO
   * Time: 4:19 PM
   * Contacts: email: mercurievvss@gmail.com Skype: 'grobokopytoff' or 'mercurievv'
   */
-class DynamodbJobsStorage {
-  private val client = {
-    val conf = new EndpointConfiguration("http://localhost:8000", "us-east-1")
-    AmazonDynamoDBAsyncClientBuilder.standard().withEndpointConfiguration(conf).build()
-  }
-  private val scanamo = ScanamoZio(client)
+class DynamodbJobsStorage(client: AmazonDynamoDBAsync) extends JobsStorage[AIO, Stream[AIO, *]] {
+  private val scanamo: ScanamoZio = ScanamoZio(client)
 
   private val table = Table[Job]("Jobs")
 
-  def putNewJobs(jobsResource: JobsResource, jobs: Set[Job]): IO[AmazonDynamoDBException, List[Either[DynamoReadError, Job]]] = {
-    val jobsFromOneResource = jobs.filter(_.jobsResource == jobsResource)
-    val op = for {
-      lastItem <- table
+  import cats.implicits._
+  implicit val eeq: Eq[JobsResource] = Eq.by[JobsResource, String](_.toString)
+
+  override def saveJobsToDb(jobs: Stream[AIO, Job]): AIO[Unit] = {
+    val ops = for {
+      byJob <- jobs.groupAdjacentBy(_.jobsResource)
+    } yield saveJobsOps(byJob._1, byJob._2.toList.toSet)
+
+    for {
+      opsp <- ops.compile.last
+      _    <- scanamo.exec(opsp.get)
+    } yield ()
+  }
+
+  private def saveJobsOps(jobsResource: JobsResource, jobs: Set[Job]) = {
+    for {
+      lastJob <- table
         .filter("jobsResource" -> jobsResource)
         .limit(1)
-        .scan()
-      _ <- table.putAll(
-        jobsFromOneResource.filter(_.created.isAfter(
-          lastItem.last.map(_.created).getOrElse(ZonedDateTime.of(2000, 1, 1, 0, 0, 0, 0, ZoneId.of("GMT"))))))
-    } yield lastItem
-    scanamo.exec(op)
+        .scan
+      jobsIO = jobs.filter(
+        _.created.isAfter(
+          lastJob.last.map(_.created).getOrElse(ZonedDateTime.of(2000, 1, 1, 1, 1, 1, 1, ZoneId.of("UTC")))))
+      _ <- table.putAll(jobsIO)
+    } yield ()
   }
 }

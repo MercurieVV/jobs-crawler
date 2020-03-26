@@ -27,3 +27,4 @@ libraryDependencies ++= Seq(
 )
 libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "1.2.0"
 //scalacOptions ++= Seq("-Ypartial-unification")
+addCompilerPlugin("org.typelevel" %% "kind-projector" % "0.11.0" cross CrossVersion.full)
