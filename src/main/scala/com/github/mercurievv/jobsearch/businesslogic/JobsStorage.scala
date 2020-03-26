@@ -10,7 +10,7 @@ import com.github.mercurievv.jobsearch.model.Job
  * Contacts: email: mercurievvss@gmail.com Skype: 'grobokopytoff' or 'mercurievv'
  */
 trait JobsStorage[F[_], S[_]] {
-  def filterNewJobsOnly(allJobs: S[Job]): S[Job]
+//  def filterNewJobsOnly(allJobs: S[Job]): S[Job]
   def saveJobsToDb(jobs: S[Job]): F[Unit]
 
 }

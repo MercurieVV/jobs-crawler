@@ -10,7 +10,7 @@ import cats.implicits._
   * Time: 9:52 PM
   * Contacts: email: mercurievvss@gmail.com Skype: 'grobokopytoff' or 'mercurievv'
   */
-class CollectJobs[F[_], S[_]](jobsOps: JobsStorage[F, S])(implicit F: Monad[F]) {
+class CollectJobs[F[_], S[_]](jobsStorage: JobsStorage[F, S])(implicit F: Monad[F]) {
   def collectJobsFromServers(jobsServers: List[JobsServer[F, S]]): F[Unit] = {
     jobsServers
       .map(collectJobFromServer)
@@ -19,7 +19,6 @@ class CollectJobs[F[_], S[_]](jobsOps: JobsStorage[F, S])(implicit F: Monad[F]) 
   private def collectJobFromServer(jobsServer: JobsServer[F, S]) =
   for {
     jobs    <- jobsServer.getJobsFromServer
-    newJobs <- F.pure(jobsOps.filterNewJobsOnly(jobs))
-    _       <- jobsOps.saveJobsToDb(newJobs)
+    _       <- jobsStorage.saveJobsToDb(jobs)
   } yield ()
 }
