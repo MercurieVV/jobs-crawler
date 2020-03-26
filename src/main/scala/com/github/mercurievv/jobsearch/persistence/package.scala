@@ -13,11 +13,11 @@ import org.scanamo.DynamoFormat
   * Contacts: email: mercurievvss@gmail.com Skype: 'grobokopytoff' or 'mercurievv'
   */
 package object persistence {
-  implicit val jobsResource: DynamoFormat[JobsResource] =
+  implicit val jobsResourceFormat: DynamoFormat[JobsResource] =
     DynamoFormat.coercedXmap[JobsResource, String, NoSuchMember[JobsResource]](JobsResource.withName)(_.entryName)
-  implicit val url: DynamoFormat[Uri] =
+  implicit val urlFormat: DynamoFormat[Uri] =
     DynamoFormat.coercedXmap[Uri, String, RuntimeException](Uri.unsafeFromString)(_.renderString)
-  implicit val id: DynamoFormat[Id] = DynamoFormat.iso[Id, String](Id(_), id => id)
-  implicit val tagg: DynamoFormat[Tag] = DynamoFormat.iso[Tag, String](Tag(_), id => id)
-  implicit val company: DynamoFormat[Company] = DynamoFormat.iso[Company, String](Company(_), id => id)
+  implicit val idFormat: DynamoFormat[Id] = DynamoFormat.iso[Id, String](Id(_), id => id)
+  implicit val taggFormat: DynamoFormat[Tag] = DynamoFormat.iso[Tag, String](Tag(_), id => id)
+  implicit val companyFormat: DynamoFormat[Company] = DynamoFormat.iso[Company, String](Company(_), id => id)
 }
