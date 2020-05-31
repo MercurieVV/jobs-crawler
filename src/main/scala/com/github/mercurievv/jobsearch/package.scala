@@ -1,5 +1,6 @@
 package com.github.mercurievv
 
+import cats.data.{NonEmptyChain, Validated}
 import zio.Task
 
 /**
@@ -11,4 +12,5 @@ import zio.Task
  */
 package object jobsearch {
   type AIO[+A] = Task[A]
+  type Errorable[A] = Validated[NonEmptyChain[String], A]
 }

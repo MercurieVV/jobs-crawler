@@ -5,6 +5,7 @@ import java.time.ZonedDateTime
 import cats.Monad
 import cats.data.{NonEmptyChain, Validated}
 import cats.implicits._
+import com.github.mercurievv.jobsearch._
 import com.github.mercurievv.jobsearch.model._
 import org.http4s.Uri
 
@@ -20,7 +21,7 @@ import scala.util.Try
 class GetJobsFromStackowerflow[F[_]](
   stackowerflowJobsApi: StackowerflowJobsApi[F]
 )(implicit F: Monad[F]) {
-  val getJobs: F[Seq[Either[NonEmptyChain[String], Job]]] = stackowerflowJobsApi.getJobsRss
+  val getJobs: F[Seq[Errorable[Job]]] = stackowerflowJobsApi.getJobsRss
     .map(
       _.channel.item.map(
         item =>
@@ -37,7 +38,6 @@ class GetJobsFromStackowerflow[F[_]](
               .flatMap(pd => Try(ZonedDateTime.parse(pd)).toEither.left.map(_.getMessage))
               .toValidatedNec
           ).mapN(Job)
-            .toEither
       )
     )
 
