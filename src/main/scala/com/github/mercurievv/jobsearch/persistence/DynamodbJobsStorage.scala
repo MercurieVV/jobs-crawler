@@ -1,6 +1,7 @@
 package com.github.mercurievv.jobsearch.persistence
 import java.time.{ZoneId, ZonedDateTime}
 
+import cats.effect.Async
 import cats.kernel.Eq
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBAsync
 import com.amazonaws.services.dynamodbv2.model.AmazonDynamoDBException
@@ -20,15 +21,15 @@ import zio.interop.catz._
   * Time: 4:19 PM
   * Contacts: email: mercurievvss@gmail.com Skype: 'grobokopytoff' or 'mercurievv'
   */
-class DynamodbJobsStorage(client: AmazonDynamoDBAsync) extends JobsStorage[AIO, Stream[AIO, *]] {
-  private val scanamo: ScanamoZio = ScanamoZio(client)
+class DynamodbJobsStorage[F[_]: Async](client: AmazonDynamoDBAsync) extends JobsStorage[F, Stream[F, *]] {
+  private val scanamo: ScanamoCats[F] = ScanamoCats[F](client)
 
   private val table = Table[Job]("Jobs")
 
   import cats.implicits._
   implicit val eeq: Eq[JobsResource] = Eq.by[JobsResource, String](_.toString)
 
-  override def saveJobsToDb(jobs: Stream[AIO, Job]): AIO[Unit] = {
+  override def saveJobsToDb(jobs: Stream[F, Job]): F[Unit] = {
     val ops = for {
       byJob <- jobs.groupAdjacentBy(_.jobsResource)
     } yield saveJobsOps(byJob._1, byJob._2.toList.toSet)

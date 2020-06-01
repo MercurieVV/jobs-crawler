@@ -43,19 +43,13 @@ object AppHandler extends RequestStreamHandler {
   val seqToList = λ[Seq ~> List](_.toList)
   val sToFs2: List ~> Stream[AIO, *] = λ[List ~> fs2.Stream[AIO, *]](fs2.Stream.emits(_))
 
-  private val dbclient = {
-    val conf = new EndpointConfiguration("http://localhost:8000", "us-east-1")
-    AmazonDynamoDBAsyncClientBuilder.standard().withEndpointConfiguration(conf).build()
-  }
-  val dynDbStorage = new DynamodbJobsStorage(dbclient)
-  val saveJobs: List[Job] => AIO[Unit] = s => dynDbStorage.saveJobsToDb (sToFs2(s))
 
   def run(): ZManaged[zio.ZEnv, Nothing, Int] = {
     type AppEnvironment = Clock with Console with Blocking
     ZIO.runtime[AppEnvironment].flatMap { implicit rts =>
 
       BlazeClientBuilder[AIO](global).resource.use { client =>
-        val module = new Module[AIO, List](client, seqToList, saveJobs)
+        val module = new Module[AIO, List](client, seqToList, sToFs2)
         module.collectJobs.collectJobsFromServers(module.jobsServers)
       }
     }
