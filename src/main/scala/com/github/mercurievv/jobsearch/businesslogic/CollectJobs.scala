@@ -13,7 +13,7 @@ import org.slf4j.{Logger, LoggerFactory}
   * Time: 9:52 PM
   * Contacts: email: mercurievvss@gmail.com Skype: 'grobokopytoff' or 'mercurievv'
   */
-class CollectJobs[F[_]: Monad, S[_]: Monad : FunctorFilter](jobsStorage: JobsStorage[F, S]) {
+class CollectJobs[F[_]: Monad, S[_]: Monad: FunctorFilter](saveJobs: S[Job] => F[Unit]) {
   private val log: Logger = LoggerFactory.getLogger(classOf[CollectJobs[Nothing, Nothing]])
   def collectJobsFromServers(jobsServers: List[JobsServer[F, S]]): F[Unit] = {
     jobsServers
@@ -21,13 +21,14 @@ class CollectJobs[F[_]: Monad, S[_]: Monad : FunctorFilter](jobsStorage: JobsSto
       .sequence_
   }
   private def collectJobFromServer(jobsServer: JobsServer[F, S]) =
-  for {
-    jobs    <- jobsServer.getJobsFromServer
-    _       <- jobsStorage.saveJobsToDb(jobs.mapFilter{
-      case Valid(job) => Some(job)
-      case Invalid(errors) =>
-        log.error(errors.toString)
-        None
-    })
-  } yield ()
+    for {
+      jobsErr <- jobsServer.getJobsFromServer
+      jobs = jobsErr.mapFilter {
+        case Valid(job) => Some(job)
+        case Invalid(errors) =>
+          log.error(errors.toString)
+          None
+      }
+      _ <- saveJobs(jobs)
+    } yield ()
 }
