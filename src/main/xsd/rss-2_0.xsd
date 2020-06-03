@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" >
     <xsd:element name="rss" type="rss"/>
 
     <xsd:complexType name="rss">
@@ -19,7 +19,7 @@
     </xsd:simpleType>
 
     <xsd:complexType name="channel">
-        <xsd:sequence>
+        <xsd:all>
             <xsd:element name="title" type="xsd:string" maxOccurs="1" minOccurs="1">
                 <xsd:annotation>
                     <xsd:documentation>
@@ -88,7 +88,7 @@
                     </xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
-            <xsd:element name="pubDate" type="xsd:string" maxOccurs="1"
+            <xsd:element name="pubDate" type="xsd:dateTime" maxOccurs="1"
                          minOccurs="0">
                 <xsd:annotation>
                     <xsd:documentation>
@@ -221,7 +221,7 @@
             </xsd:element>
             <xsd:element name="item" type="item" maxOccurs="unbounded"
                          minOccurs="0"/>
-        </xsd:sequence>
+        </xsd:all>
     </xsd:complexType>
 
     <xsd:complexType name="cloud">
@@ -310,7 +310,7 @@
     </xsd:complexType>
 
     <xsd:complexType name="item">
-        <xsd:sequence>
+        <xsd:all>
             <xsd:element name="title" type="xsd:string" maxOccurs="1" minOccurs="0">
                 <xsd:annotation>
                     <xsd:documentation>
@@ -369,7 +369,7 @@
                     </xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
-            <xsd:element name="pubDate" type="xsd:string" maxOccurs="1"
+            <xsd:element name="pubDate" type="xsd:dateTime" maxOccurs="1"
                          minOccurs="0">
                 <xsd:annotation>
                     <xsd:documentation>
@@ -385,7 +385,7 @@
                     </xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
-        </xsd:sequence>
+        </xsd:all>
     </xsd:complexType>
 
     <xsd:complexType name="category">
