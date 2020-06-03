@@ -28,6 +28,7 @@ import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBAsyncClientBuilder
 import com.github.mercurievv.jobsearch.model.Job
 import com.github.mercurievv.jobsearch.persistence.DynamodbJobsStorage
+import org.http4s.client.middleware.{RequestLogger, ResponseLogger}
 
 import scala.concurrent.ExecutionContext.global
 
@@ -49,7 +50,7 @@ object AppHandler extends RequestStreamHandler {
     ZIO.runtime[AppEnvironment].flatMap { implicit rts =>
 
       BlazeClientBuilder[AIO](global).resource.use { client =>
-        val module = new Module[AIO, List](client, seqToList, sToFs2)
+        val module = new Module[AIO, List](RequestLogger(false, false)(ResponseLogger(false, true)(client)), seqToList, sToFs2)
         module.collectJobs.collectJobsFromServers(module.jobsServers)
       }
     }
