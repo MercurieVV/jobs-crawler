@@ -25,7 +25,7 @@ class Module[F[_]: Monad: Async, S[_]: Monad : FunctorFilter](
                                                         sToFs2: S ~> Stream[F, *])(implicit ce: ConcurrentEffect[F]) {
 
   private val dbclient = {
-    val conf = new EndpointConfiguration("http://localhost:8000", "us-east-1")
+    val conf = new EndpointConfiguration("https://dynamodb.eu-west-1.amazonaws.com", "eu-west-1")
     AmazonDynamoDBAsyncClientBuilder.standard().withEndpointConfiguration(conf).build()
   }
   val dynDbStorage = new DynamodbJobsStorage[F](dbclient)
