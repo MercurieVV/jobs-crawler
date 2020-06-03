@@ -5,8 +5,8 @@ import java.nio.ByteBuffer
 import cats.Monad
 import cats.data.EitherT
 import cats.effect._
-import com.github.mercurievv.rss.generated._
-import com.github.mercurievv.rss.generated._
+import com.github.mercurievv.jobsearch.xml.CustomXmlProtocol._
+import com.github.mercurievv.rss.generated.Rss
 import scalaxb._
 import org.http4s._
 import org.http4s.client.Client
