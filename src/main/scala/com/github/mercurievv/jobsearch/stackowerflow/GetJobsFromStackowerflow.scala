@@ -35,7 +35,7 @@ class GetJobsFromStackowerflow[F[_]](
             item.author.toValidNec("author").map(Company(_)),
             item.pubDate
               .toRight("pubDate")
-              .flatMap(pd => Try(ZonedDateTime.parse(pd)).toEither.left.map(_.getMessage))
+              .flatMap(pd => Try(pd.toGregorianCalendar.toZonedDateTime).toEither.left.map(_.getMessage))
               .toValidatedNec
           ).mapN(Job)
       )
