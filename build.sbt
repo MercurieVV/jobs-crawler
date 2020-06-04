@@ -39,7 +39,10 @@ libraryDependencies ++= Seq(
   "dev.zio" %% "zio"                                       % "1.0.0-RC18-2",
   "dev.zio" %% "zio-interop-cats"                          % "2.0.0.0-RC12",
   "com.github.mercurievv" %% "bulyon-lambda-http4s-fs2zio" % "1.0.12",
-  "org.typelevel" %% "simulacrum"                          % "1.0.0"
+  "org.typelevel" %% "simulacrum"                          % "1.0.0",
+
+  "org.scalactic" %% "scalactic" % "3.1.2",
+  "org.scalatest" %% "scalatest" % "3.1.2" % "test"
 )
 libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "1.2.0"
 //scalacOptions ++= Seq("-Ypartial-unification")
