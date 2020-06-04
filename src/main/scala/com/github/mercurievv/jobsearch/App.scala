@@ -17,12 +17,12 @@ import scala.concurrent.ExecutionContext.global
   * Time: 5:24 PM
   * Contacts: email: mercurievvss@gmail.com Skype: 'grobokopytoff' or 'mercurievv'
   */
-object App extends ManagedApp {
+object App extends zio.App {
   import zio._
   import zio.clock.Clock
   import zio.interop.catz._
 
-  override def run(args: List[String]): ZManaged[zio.ZEnv, Nothing, Int] = {
-    AppHandler.run()
+  override def run(args: List[String]): ZIO[zio.ZEnv, Nothing, Int] = {
+    AppHandler.run(this)
   }
 }
