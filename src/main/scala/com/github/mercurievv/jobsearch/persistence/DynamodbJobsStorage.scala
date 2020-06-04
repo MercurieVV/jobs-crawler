@@ -48,7 +48,7 @@ class DynamodbJobsStorage[F[_]: Async](client: AmazonDynamoDBAsync) extends Jobs
         .scan
       jobsIO = jobs.filter(
         _.created.isAfter(
-          lastJob.last.map(_.created).getOrElse(ZonedDateTime.of(2000, 1, 1, 1, 1, 1, 1, ZoneId.of("UTC")))))
+          lastJob.lastOption.flatMap(_.toOption).map(_.created).getOrElse(ZonedDateTime.of(2000, 1, 1, 1, 1, 1, 1, ZoneId.of("UTC")))))
       _ <- table.putAll(jobsIO)
     } yield ()
   }
