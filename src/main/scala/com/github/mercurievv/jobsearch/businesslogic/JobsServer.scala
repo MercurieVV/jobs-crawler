@@ -25,7 +25,7 @@ sealed trait JobsServer[F[_], S[_]] /*extends EnumEntry*/ {
 object JobsServer /*extends Enum[JobsServer[*, *]] */{
 //  val values = findValues
 
-  class StackOwerflow[F[_] : Monad, S[_]](getJobs: GetJobsFromStackowerflow[F], seqToS: Seq ~> S) extends JobsServer[F, S] {
+  final class StackOwerflow[F[_] : Monad, S[_]](getJobs: GetJobsFromStackowerflow[F], seqToS: Seq ~> S) extends JobsServer[F, S] {
     override def getJobsFromServer: F[S[Errorable[Job]]] = getJobs.getJobs.map(seqToS(_))
   }
 

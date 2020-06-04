@@ -31,13 +31,11 @@ class DynamodbJobsStorage[F[_]: Async](client: AmazonDynamoDBAsync) extends Jobs
 
   override def saveJobsToDb(jobs: Stream[F, Job]): F[Unit] = {
     val ops = for {
-      byJob <- jobs.groupAdjacentBy(_.jobsResource)
-    } yield saveJobsOps(byJob._1, byJob._2.toList.toSet)
-
-    for {
-      opsp <- ops.compile.last
-      _    <- scanamo.exec(opsp.get)
-    } yield ()
+      byJob     <- jobs.groupAdjacentBy(_.jobsResource)
+      operation <- Stream.emit(saveJobsOps(byJob._1, byJob._2.toList.toSet))
+      save      <- Stream.eval(scanamo.exec(operation))
+    } yield save
+    ops.compile.drain
   }
 
   private def saveJobsOps(jobsResource: JobsResource, jobs: Set[Job]) = {
@@ -48,7 +46,10 @@ class DynamodbJobsStorage[F[_]: Async](client: AmazonDynamoDBAsync) extends Jobs
         .scan
       jobsIO = jobs.filter(
         _.created.isAfter(
-          lastJob.lastOption.flatMap(_.toOption).map(_.created).getOrElse(ZonedDateTime.of(2000, 1, 1, 1, 1, 1, 1, ZoneId.of("UTC")))))
+          lastJob.lastOption
+            .flatMap(_.toOption)
+            .map(_.created)
+            .getOrElse(ZonedDateTime.of(2000, 1, 1, 1, 1, 1, 1, ZoneId.of("UTC")))))
       _ <- table.putAll(jobsIO)
     } yield ()
   }

@@ -23,7 +23,6 @@ object CustomXmlProtocol extends XMLProtocol {
       import java.util.GregorianCalendar
       val gregory = new GregorianCalendar
       gregory.setTime(date)
-      DatatypeFactory.newInstance().newXMLGregorianCalendar(gregory)
       Right(DatatypeFactory.newInstance().newXMLGregorianCalendar(gregory)) }
     catch
       { case e: Exception => Left(e.toString) }

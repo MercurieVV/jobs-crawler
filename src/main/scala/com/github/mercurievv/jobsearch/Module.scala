@@ -28,10 +28,10 @@ class Module[F[_]: Monad: Async, S[_]: Monad : FunctorFilter](
     val conf = new EndpointConfiguration("https://dynamodb.eu-west-1.amazonaws.com", "eu-west-1")
     AmazonDynamoDBAsyncClientBuilder.standard().withEndpointConfiguration(conf).build()
   }
-  val dynDbStorage = new DynamodbJobsStorage[F](dbclient)
+  private val dynDbStorage = new DynamodbJobsStorage[F](dbclient)
   val saveJobs: S[Job] => F[Unit] = s => dynDbStorage.saveJobsToDb (sToFs2(s))
 
-  val jobs = new GetJobsFromStackowerflow[F](new StackowerflowJobsApi[F](httpClient))
-  val collectJobs = new CollectJobs(saveJobs)
-  val jobsServers = List(new JobsServer.StackOwerflow(new GetJobsFromStackowerflow[F](new StackowerflowJobsApi[F](httpClient)), seqToS))
+  val jobs: GetJobsFromStackowerflow[F] = new GetJobsFromStackowerflow[F](new StackowerflowJobsApi[F](httpClient))
+  val collectJobs: CollectJobs[F, S] = new CollectJobs(saveJobs)
+  val jobsServers: List[JobsServer[F, S]] = List(new JobsServer.StackOwerflow(new GetJobsFromStackowerflow[F](new StackowerflowJobsApi[F](httpClient)), seqToS))
 }

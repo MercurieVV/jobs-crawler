@@ -38,12 +38,12 @@ object AppHandler extends RequestStreamHandler {
   type AppEnvironment = Clock with Console with Blocking
 
   override def handleRequest(input: InputStream, output: OutputStream, context: Context): Unit = {
-    Runtime
+    println(Runtime
       .default
-      .unsafeRunSync(run(Runtime.default))
+      .unsafeRunSync(run(Runtime.default)))
   }
-  val seqToList = λ[Seq ~> List](_.toList)
-  val sToFs2: List ~> Stream[AIO, *] = λ[List ~> fs2.Stream[AIO, *]](fs2.Stream.emits(_))
+  private val seqToList = λ[Seq ~> List](_.toList)
+  private val sToFs2: List ~> Stream[AIO, *] = λ[List ~> fs2.Stream[AIO, *]](fs2.Stream.emits(_))
 
   def run[R <: Console](implicit runtime: Runtime[R]): ZIO[R, Nothing, Int] = {
     BlazeClientBuilder[AIO](global)
@@ -51,7 +51,7 @@ object AppHandler extends RequestStreamHandler {
       .toManagedZIO
       .use {
         client =>
-          val clientLogged = RequestLogger(false, false)(ResponseLogger(false, true)(client))
+          val clientLogged = RequestLogger(logHeaders = false, logBody = false)(ResponseLogger(logHeaders = false, logBody = true)(client))
           val module = new Module[AIO, List](clientLogged, seqToList, sToFs2)
           module.collectJobs.collectJobsFromServers(module.jobsServers)
       }

@@ -44,6 +44,7 @@ object Http4sScalaxbEncodersDecoders {
     }
   }
 
+  @SuppressWarnings(Array("org.wartremover.warts.ImplicitConversion"))
   implicit def xmlEncoder[F[_], T](elementLabel: String, scope: NamespaceBinding)(
     implicit format: scalaxb.CanWriteXML[T],
     C: ConcurrentEffect[F]

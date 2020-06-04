@@ -11,7 +11,14 @@ lazy val scalaParser = "org.scala-lang.modules" %% "scala-parser-combinators" % 
 lazy val root = (project in file("."))
   .enablePlugins(ScalaxbPlugin)
   .settings(
-    scalaxbPackageName in (Compile, scalaxb) := "com.github.mercurievv.rss.generated"
+    scalaxbPackageName in (Compile, scalaxb) := "com.github.mercurievv.rss.generated",
+    sourceManaged in (Compile, scalaxb) := (Compile / sourceManaged).value,
+/*    test := {
+      dependencyCheck.value
+      dependencyUpdates.value
+    },*/
+    wartremoverErrors in (Compile, compile) ++= Warts.allBut(Wart.Any, Wart.AnyVal, Wart.Nothing, Wart.StringPlusAny, Wart.ToString, Wart.FinalCaseClass),
+    wartremoverExcluded += sourceManaged.value
   )
   .enablePlugins(AwsLambdaPlugin)
   .settings(
@@ -29,6 +36,7 @@ lazy val root = (project in file("."))
   )
 val http4sVersion = "0.21.0"
 libraryDependencies ++= Seq(
+  "org.slf4j" % "slf4j-simple" % "1.7.30",
   "org.http4s" %% "http4s-dsl"                             % http4sVersion,
   "org.http4s" %% "http4s-blaze-client"                    % http4sVersion,
   "com.beachape" %% "enumeratum"                           % "1.5.15",
