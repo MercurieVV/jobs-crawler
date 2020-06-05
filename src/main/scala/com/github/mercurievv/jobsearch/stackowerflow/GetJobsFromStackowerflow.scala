@@ -3,13 +3,12 @@ package com.github.mercurievv.jobsearch.stackowerflow
 import java.time.ZonedDateTime
 
 import cats.Monad
-import cats.data.{NonEmptyChain, Validated}
+import cats.data.{Validated, ValidatedNec}
 import cats.implicits._
 import com.github.mercurievv.jobsearch._
 import com.github.mercurievv.jobsearch.model._
+import com.github.mercurievv.rss.generated.Item
 import org.http4s.Uri
-
-import scala.util.Try
 
 /**
   * Created with IntelliJ IDEA.
@@ -23,22 +22,41 @@ class GetJobsFromStackowerflow[F[_]](
 )(implicit F: Monad[F]) {
   val getJobs: F[Seq[Errorable[Job]]] = stackowerflowJobsApi.getJobsRss
     .map(
-      _.channel.item.map(
-        item =>
-          (
-            JobsResource.StackOverflow.validNec,
-            item.guid.toValidNec("guid").map(_.value).map(Id(_)),
-            item.link.toValidNec("link").map(Uri.unsafeFromString),
-            item.title.toValidNec("title"),
-            item.description.toValidNec("description"),
-            item.category.map(_.value).map(Tag(_)).validNec,
-            item.author.toValidNec("author").map(Company(_)),
-            item.pubDate
-              .toRight("pubDate")
-              .flatMap(pd => Try(pd.toGregorianCalendar.toZonedDateTime).toEither.left.map(_.getMessage))
-              .toValidatedNec
-          ).mapN(Job)
-      )
+      _.channel
+        .item
+        .map(mapRssItemToJob)
     )
 
+  def mapRssItemToJob(item : Item): ValidatedNec[ParsingError, Job] = {
+      val ur: String => ValidatedNec[ParsingError, Uri] = (s: String) => Uri
+        .fromString(s)
+        .leftMap(new ParsingError(_))
+        .toValidatedNec
+      val value: ValidatedNec[ParsingError, Uri] = item
+        .link
+        .toValidNec(ParsingError("link"))
+        .andThen(ur)
+
+      val zdt: ValidatedNec[ParsingError, ZonedDateTime] = item
+        .pubDate
+        .toValidNec(ParsingError("pubDate"))
+        .andThen(gc => Validated.catchNonFatal(gc.toGregorianCalendar.toZonedDateTime).leftMap(new ParsingError(_)).toValidatedNec)
+
+      (
+        JobsResource.StackOverflow.validNec,
+        item.guid.toValidNec(ParsingError("guid")).map(_.value).map(Id(_)),
+        value,
+        item.title.toValidNec(ParsingError("title")),
+        item.description.toValidNec(ParsingError("description")),
+        item.category.map(_.value).map(Tag(_)).validNec,
+        item.author.toValidNec(ParsingError("author")).map(Company(_)),
+        zdt
+        ).mapN(Job)
+  }
+
+  case class ParsingError(message: String, cause: Option[Throwable] = None) extends Throwable(message){
+    def this(cause: Throwable) {
+      this(cause.getMessage, Some(cause))
+    }
+  }
 }

@@ -12,5 +12,5 @@ import zio.Task
  */
 package object jobsearch {
   type AIO[+A] = Task[A]
-  type Errorable[A] = Validated[NonEmptyChain[String], A]
+  type Errorable[A] = Validated[NonEmptyChain[Throwable], A]
 }
