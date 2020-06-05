@@ -8,17 +8,22 @@ scalaVersion := "2.13.1"
 lazy val scalaXml = "org.scala-lang.modules" %% "scala-xml"                   % "1.0.2"
 lazy val scalaParser = "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.1"
 
+logLevel in stryker := Level.Debug
+lazy val longTest = taskKey[Unit]("Execute long test, before commit")
+
 lazy val root = (project in file("."))
   .enablePlugins(ScalaxbPlugin)
   .settings(
     scalaxbPackageName in (Compile, scalaxb) := "com.github.mercurievv.rss.generated",
     sourceManaged in (Compile, scalaxb) := (Compile / sourceManaged).value,
-/*    test := {
+    wartremoverErrors in (Compile, compile) ++= Warts.allBut(Wart.Any, Wart.AnyVal, Wart.Nothing, Wart.StringPlusAny, Wart.ToString, Wart.FinalCaseClass),
+    wartremoverExcluded += sourceManaged.value,
+    longTest := {
+//      scalafmtCheck.value
       dependencyCheck.value
       dependencyUpdates.value
-    },*/
-    wartremoverErrors in (Compile, compile) ++= Warts.allBut(Wart.Any, Wart.AnyVal, Wart.Nothing, Wart.StringPlusAny, Wart.ToString, Wart.FinalCaseClass),
-    wartremoverExcluded += sourceManaged.value
+      stryker.value
+    }
   )
   .enablePlugins(AwsLambdaPlugin)
   .settings(
