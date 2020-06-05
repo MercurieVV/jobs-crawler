@@ -38,26 +38,22 @@ object AppHandler extends RequestStreamHandler {
   type AppEnvironment = Clock with Console with Blocking
 
   override def handleRequest(input: InputStream, output: OutputStream, context: Context): Unit = {
-    println(Runtime
-      .default
-      .unsafeRunSync(run(Runtime.default)))
+    println(
+      Runtime.default
+        .unsafeRunSync(run(Runtime.default)))
   }
   private val seqToList = λ[Seq ~> List](_.toList)
   private val sToFs2: List ~> Stream[AIO, *] = λ[List ~> fs2.Stream[AIO, *]](fs2.Stream.emits(_))
 
   def run[R <: Console](implicit runtime: Runtime[R]): ZIO[R, Nothing, Int] = {
-    BlazeClientBuilder[AIO](global)
-      .resource
-      .toManagedZIO
-      .use {
-        client =>
-          val clientLogged = RequestLogger(logHeaders = false, logBody = false)(ResponseLogger(logHeaders = false, logBody = true)(client))
-          val module = new Module[AIO, List](clientLogged, seqToList, sToFs2)
-          module.collectJobs.collectJobsFromServers(module.jobsServers)
+    BlazeClientBuilder[AIO](global).resource.toManagedZIO
+      .map(client => new Module[AIO, List](client, seqToList, sToFs2))
+      .use { module =>
+        module.collectJobs.collectJobsFromServers(module.jobsServers)
       }
       .foldM(
-          err => putStrLn(s"Execution failed with: $err").as(1),
-          _ => ZIO.succeed(0)
+        err => putStrLn(s"Execution failed with: $err").as(1),
+        _ => ZIO.succeed(0)
       )
   }
 }
