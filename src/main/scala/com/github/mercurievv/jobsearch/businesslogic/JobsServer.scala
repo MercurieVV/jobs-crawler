@@ -5,7 +5,8 @@ import cats._
 import cats.implicits._
 import com.github.mercurievv.jobsearch.Errorable
 import com.github.mercurievv.jobsearch.model.Job
-import com.github.mercurievv.jobsearch.remote.stackowerflow.GetJobsFromStackowerflow
+import com.github.mercurievv.jobsearch.remote.stackowerflow.{RssItemToJobConverter, StackowerflowJobsApi}
+import com.github.mercurievv.jobsearch.remote.upwork.UpworkJobsApi
 import simulacrum._
 
 /**
@@ -22,11 +23,14 @@ sealed trait JobsServer[F[_], S[_]] /*extends EnumEntry*/ {
 
 }
 
-object JobsServer /*extends Enum[JobsServer[*, *]] */{
+object JobsServer /*extends Enum[JobsServer[*, *]]*/ {
 //  val values = findValues
 
-  final class StackOwerflow[F[_] : Monad, S[_]](getJobs: GetJobsFromStackowerflow[F], seqToS: Seq ~> S) extends JobsServer[F, S] {
-    override def getJobsFromServer: F[S[Errorable[Job]]] = getJobs.getJobs.map(seqToS(_))
+  final class StackOwerflow[F[_] : Monad, S[_]](api: StackowerflowJobsApi[F], seqToS: Seq ~> S) extends JobsServer[F, S] {
+    override def getJobsFromServer: F[S[Errorable[Job]]] = api.getJobsRss.map(RssItemToJobConverter(_)).map(seqToS(_))
   }
 
+  final class Upwork[F[_] : Monad, S[_]](api: UpworkJobsApi[F], seqToS: Seq ~> S) extends JobsServer[F, S] {
+    override def getJobsFromServer: F[S[Errorable[Job]]] = api.getJobsRss.map(RssItemToJobConverter(_)).map(seqToS(_))
+  }
 }

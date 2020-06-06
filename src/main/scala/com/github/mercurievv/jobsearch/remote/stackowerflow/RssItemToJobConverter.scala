@@ -7,7 +7,7 @@ import cats.data.{Validated, ValidatedNec}
 import cats.implicits._
 import com.github.mercurievv.jobsearch._
 import com.github.mercurievv.jobsearch.model._
-import com.github.mercurievv.rss.generated.Item
+import com.github.mercurievv.rss.generated.{Item, Rss}
 import org.http4s.Uri
 
 /**
@@ -17,17 +17,10 @@ import org.http4s.Uri
   * Time: 11:49 AM
   * Contacts: email: mercurievvss@gmail.com Skype: 'grobokopytoff' or 'mercurievv'
   */
-class GetJobsFromStackowerflow[F[_]](
-  stackowerflowJobsApi: StackowerflowJobsApi[F]
-)(implicit F: Monad[F]) {
-  val getJobs: F[Seq[Errorable[Job]]] = stackowerflowJobsApi.getJobsRss
-    .map(
-      _.channel
-        .item
-        .map(mapRssItemToJob)
-    )
+object RssItemToJobConverter{
+  def apply(rss: Rss): Seq[Errorable[Job]] = rss.channel.item.map(mapRssItemToJob)
 
-  def mapRssItemToJob(item : Item): ValidatedNec[ParsingError, Job] = {
+  def mapRssItemToJob(item : Item): Errorable[Job] = {
       val ur: String => ValidatedNec[ParsingError, Uri] = (s: String) => Uri
         .fromString(s)
         .leftMap(new ParsingError(_))
@@ -49,7 +42,7 @@ class GetJobsFromStackowerflow[F[_]](
         item.title.toValidNec(ParsingError("title")),
         item.description.toValidNec(ParsingError("description")),
         item.category.map(_.value).map(Tag(_)).validNec,
-        item.author.toValidNec(ParsingError("author")).map(Company(_)),
+        item.author.orElse(Some("Unknown")).toValidNec(ParsingError("author")).map(Company(_)),
         zdt
         ).mapN(Job)
   }

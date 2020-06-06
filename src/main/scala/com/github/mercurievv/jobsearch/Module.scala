@@ -4,10 +4,12 @@ import cats.{FunctorFilter, Monad, ~>}
 import cats.effect.{Async, ConcurrentEffect}
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBAsyncClientBuilder
+import com.github.mercurievv.jobsearch
 import com.github.mercurievv.jobsearch.businesslogic.{CollectJobs, JobsServer}
 import com.github.mercurievv.jobsearch.model.Job
 import com.github.mercurievv.jobsearch.persistence.DynamodbJobsStorage
-import com.github.mercurievv.jobsearch.remote.stackowerflow.{GetJobsFromStackowerflow, StackowerflowJobsApi}
+import com.github.mercurievv.jobsearch.remote.stackowerflow.{RssItemToJobConverter, StackowerflowJobsApi}
+import com.github.mercurievv.jobsearch.remote.upwork.UpworkJobsApi
 import fs2.Stream
 import org.http4s.client.Client
 import org.http4s.client.middleware.{RequestLogger, ResponseLogger}
@@ -32,7 +34,9 @@ class Module[F[_]: Monad: Async, S[_]: Monad : FunctorFilter](
   private val dynDbStorage = new DynamodbJobsStorage[F](dbclient)
   val saveJobs: S[Job] => F[Unit] = s => dynDbStorage.saveJobsToDb (sToFs2(s))
 
-  val jobs: GetJobsFromStackowerflow[F] = new GetJobsFromStackowerflow[F](new StackowerflowJobsApi[F](client))
   val collectJobs: CollectJobs[F, S] = new CollectJobs(saveJobs)
-  val jobsServers: List[JobsServer[F, S]] = List(new JobsServer.StackOwerflow(new GetJobsFromStackowerflow[F](new StackowerflowJobsApi[F](httpClient)), seqToS))
+  val jobsServers: List[JobsServer[F, S]] = List(
+    new JobsServer.StackOwerflow(new StackowerflowJobsApi[F](client), seqToS),
+    new JobsServer.Upwork(new UpworkJobsApi[F](client), seqToS),
+  )
 }

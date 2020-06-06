@@ -42,6 +42,19 @@ class RssTest extends org.scalatest.FunSuite {
         |        <pubDate>Sat, 30 May 2020 11:37:12 Z</pubDate>
         |        <a10:updated>2020-05-30T11:37:12Z</a10:updated>
         |    </item>
+        |    <item>
+        |            <title><![CDATA[Create Logo and Web Pages for New IT Service - Upwork]]></title>
+        |            <link>
+        |                https://www.upwork.com/jobs/Create-Logo-and-Web-Pages-for-New-Service_%7E0159da9cec51ec4459?source=rss
+        |            </link>
+        |            <description><![CDATA[]]></description>
+        |            <content:encoded><![CDATA[]]></content:encoded>
+        |            <pubDate>Sat, 06 Jun 2020 14:52:58 +0000</pubDate>
+        |            <guid>
+        |                https://www.upwork.com/jobs/Create-Logo-and-Web-Pages-for-New-Service_%7E0159da9cec51ec4459?source=rss
+        |            </guid>
+        |        </item>
+        |
         |
         |</channel></rss>
         |""".stripMargin))
