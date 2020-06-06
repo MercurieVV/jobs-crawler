@@ -9,25 +9,13 @@ package com.github.mercurievv.jobsearch
   */
 import java.io.{InputStream, OutputStream}
 
-import cats.arrow.FunctionK
-import com.amazonaws.services.lambda.runtime.{Context, RequestStreamHandler}
-import com.github.mercurievv.bulyon.lambdahttp4s.fs2zio.SimpleZioHandler
-import fs2._
-import org.http4s._
-import org.http4s.client.blaze.BlazeClientBuilder
-import org.http4s.dsl.impl.Root
-import org.http4s.dsl.io.{->, /, POST}
-import zio.ZIO
-import zio.blocking.Blocking
-import zio.console.{putStrLn, Console}
-import zio.interop.catz._
-import zio.interop.catz.implicits._
-import cats.implicits._
 import cats._
-import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDBAsyncClientBuilder
-import com.github.mercurievv.jobsearch.AppHandler.AppEnvironment
-import org.http4s.client.middleware.{RequestLogger, ResponseLogger}
+import cats.implicits._
+import com.amazonaws.services.lambda.runtime.{Context, RequestStreamHandler}
+import fs2._
+import org.http4s.client.blaze.BlazeClientBuilder
+import zio.blocking.Blocking
+import zio.console.{Console, putStrLn}
 
 import scala.concurrent.ExecutionContext.global
 

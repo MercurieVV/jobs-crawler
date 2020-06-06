@@ -4,15 +4,11 @@ import java.time.{ZoneId, ZonedDateTime}
 import cats.effect.Async
 import cats.kernel.Eq
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBAsync
-import com.amazonaws.services.dynamodbv2.model.AmazonDynamoDBException
-import com.github.mercurievv.jobsearch.AIO
 import com.github.mercurievv.jobsearch.businesslogic.JobsStorage
 import com.github.mercurievv.jobsearch.model.{Job, JobsResource}
 import fs2._
 import org.scanamo._
 import org.scanamo.generic.auto._
-import zio.IO
-import zio.interop.catz._
 
 /**
   * Created with IntelliJ IDEA.
