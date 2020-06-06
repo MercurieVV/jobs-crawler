@@ -1,6 +1,6 @@
 import BuildKeys._
 import Boilerplate._
-
+import wartremover.WartRemover.autoImport.wartremoverErrors
 
 // ---------------------------------------------------------------------------
 // Commands
@@ -22,9 +22,9 @@ val CatsVersion = "2.1.1"
 val CatsEffectVersion = "2.1.3"
 
 /**
- * ZIO asynchronous and concurrent programming library
- * [[https://zio.dev/]]
- */
+  * ZIO asynchronous and concurrent programming library
+  * [[https://zio.dev/]]
+  */
 val ZIOVersion = "1.0.0-RC18-1"
 
 /** Newtype (opaque type) definitions:
@@ -68,20 +68,18 @@ val BetterMonadicForVersion = "0.3.1"
 val SilencerVersion = "1.6.0"
 
 /**
- * Li Haoyi Ammonite repl embed:
- * [[https://ammonite.io/]]
- */
+  * Li Haoyi Ammonite repl embed:
+  * [[https://ammonite.io/]]
+  */
 val AmmoniteVersion = "2.0.0"
 
 val http4sVersion = "0.21.0"
-
 
 lazy val scalaXml = "org.scala-lang.modules" %% "scala-xml"                   % "1.0.2"
 lazy val scalaParser = "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.1"
 
 logLevel in stryker := Level.Debug
 lazy val longTest = taskKey[Unit]("Execute long test, before commit")
-
 
 /**
   * Defines common plugins between all projects.
@@ -97,35 +95,34 @@ def defaultPlugins: Project ⇒ Project = pr => {
 }
 
 lazy val sharedSettings = Seq(
-  projectTitle := "Jobs Crawler",
-  githubOwnerID := "MercurieVV",
+  projectTitle               := "Jobs Crawler",
+  githubOwnerID              := "MercurieVV",
   githubRelativeRepositoryID := "jobs-crawler",
-
-  organization := "com.github.mercurievv",
-  scalaVersion := "2.13.1",
+  organization               := "com.github.mercurievv",
+  scalaVersion               := "2.13.1",
   // More version specific compiler options
   scalacOptions ++= (CrossVersion.partialVersion(scalaVersion.value) match {
     case Some((2, v)) if v <= 12 =>
       Seq(
-        "-Ypartial-unification",
+        "-Ypartial-unification"
       )
     case _ =>
       Seq(
         // Replaces macro-paradise in Scala 2.13
-        "-Ymacro-annotations",
+        "-Ymacro-annotations"
       )
   }),
-
-    // Turning off fatal warnings for doc generation
+  // Turning off fatal warnings for doc generation
+  scalacOptions.in(Compile) ~= { options: Seq[String] =>
+  options.filterNot(Set(
+    "-Xlint:package-object-classes"
+  ))},
   scalacOptions.in(Compile, doc) ~= filterConsoleScalacOptions,
   // Silence all warnings from src_managed files
   scalacOptions += "-P:silencer:pathFilters=.*[/]src_managed[/].*",
-
-
-  addCompilerPlugin("org.typelevel" % "kind-projector" % KindProjectorVersion cross CrossVersion.full),
+  addCompilerPlugin("org.typelevel"                      % "kind-projector" % KindProjectorVersion cross CrossVersion.full),
   addCompilerPlugin("com.olegpy" %% "better-monadic-for" % BetterMonadicForVersion),
-  addCompilerPlugin("com.github.ghik" % "silencer-plugin" % SilencerVersion cross CrossVersion.full),
-
+  addCompilerPlugin("com.github.ghik"                    % "silencer-plugin" % SilencerVersion cross CrossVersion.full),
   // ScalaDoc settings
   autoAPIMappings := true,
   scalacOptions in ThisBuild ++= Seq(
@@ -134,147 +131,144 @@ lazy val sharedSettings = Seq(
     // absolute path of the source file, the absolute path of that file
     // will be put into the FILE_SOURCE variable, which is
     // definitely not what we want.
-    "-sourcepath", file(".").getAbsolutePath.replaceAll("[.]$", "")
+    "-sourcepath",
+    file(".").getAbsolutePath.replaceAll("[.]$", "")
   ),
-
   // https://github.com/sbt/sbt/issues/2654
   incOptions := incOptions.value.withLogRecompileOnMacro(false),
-
   // ---------------------------------------------------------------------------
   // Options for testing
-
   testFrameworks += new TestFramework("minitest.runner.Framework"),
-  logBuffered in Test := false,
+  logBuffered in Test            := false,
   logBuffered in IntegrationTest := false,
   // Disables parallel execution
-  parallelExecution in Test := false,
-  parallelExecution in IntegrationTest := false,
-  testForkedParallel in Test := false,
+  parallelExecution in Test             := false,
+  parallelExecution in IntegrationTest  := false,
+  testForkedParallel in Test            := false,
   testForkedParallel in IntegrationTest := false,
   concurrentRestrictions in Global += Tags.limit(Tags.Test, 1),
-
   // ---------------------------------------------------------------------------
   // Options meant for publishing on Maven Central
-
   publishArtifact in Test := false,
-  pomIncludeRepository := { _ => false }, // removes optional dependencies
-
-  licenses := Seq("APL2" -> url("http://www.apache.org/licenses/LICENSE-2.0.txt")),
-  headerLicense := Some(HeaderLicense.Custom(
-    s"""|Copyright (c) 2020 the ${projectTitle.value} contributors.
-        |Licensed under the Apache License, Version 2.0 (the "License");
-        |you may not use this file except in compliance with the License.
-        |You may obtain a copy of the License at
-        |
-        |    http://www.apache.org/licenses/LICENSE-2.0
-        |
-        |Unless required by applicable law or agreed to in writing, software
-        |distributed under the License is distributed on an "AS IS" BASIS,
-        |WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-        |See the License for the specific language governing permissions and
-        |limitations under the License."""
-      .stripMargin)),
-
+  pomIncludeRepository := { _ =>
+    false
+  }, // removes optional dependencies
+  licenses      := Seq("APL2" -> url("http://www.apache.org/licenses/LICENSE-2.0.txt")),
+  headerLicense := Some(HeaderLicense.Custom(s"""|Copyright (c) 2020 the ${projectTitle.value} contributors.
+                                                 |Licensed under the Apache License, Version 2.0 (the "License");
+                                                 |you may not use this file except in compliance with the License.
+                                                 |You may obtain a copy of the License at
+                                                 |
+                                                 |    http://www.apache.org/licenses/LICENSE-2.0
+                                                 |
+                                                 |Unless required by applicable law or agreed to in writing, software
+                                                 |distributed under the License is distributed on an "AS IS" BASIS,
+                                                 |WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+                                                 |See the License for the specific language governing permissions and
+                                                 |limitations under the License.""".stripMargin)),
   scmInfo := Some(
     ScmInfo(
       url(s"https://github.com/${githubFullRepositoryID.value}"),
       s"scm:git@github.com:${githubFullRepositoryID.value}.git"
     )),
-
   developers := List(
     Developer(
-      id="mercurievv",
-      name="Viktors Kalinins",
-      email="mercurievv@gmail.com",
-      url=url("https://github.com/MercurieVV")
+      id = "mercurievv",
+      name = "Viktors Kalinins",
+      email = "mercurievv@gmail.com",
+      url = url("https://github.com/MercurieVV")
     )),
-
   // -- Settings meant for deployment on oss.sonatype.org
 //  sonatypeProfileName := organization.value,
+
+    wartremoverErrors in (Compile, compile) ++= Warts.allBut(
+    Wart.Any,
+    Wart.AnyVal,
+    Wart.Nothing,
+    Wart.StringPlusAny,
+    Wart.ToString,
+    Wart.FinalCaseClass,
+    Wart.DefaultArguments,
+    Wart.Overloading
+  ),
+  wartremoverExcluded += sourceManaged.value,
 )
 
-lazy val jobs_crawler = project.in(file("."))
-//  .enablePlugins(ScalaUnidocPlugin)
+lazy val jobs_crawler = project
+  .in(file("."))
   .configure(defaultPlugins)
   .settings(sharedSettings)
   .settings(doNotPublishArtifact)
   .settings(
     // Try really hard to not execute tasks in parallel ffs
-    Global / concurrentRestrictions := Tags.limitAll(1) :: Nil,
+    Global / concurrentRestrictions := Tags.limitAll(1) :: Nil
   )
 
 lazy val core =
   project
-  .in(file("core"))
-  .settings(
-    scalaxbPackageName in (Compile, scalaxb) := "com.github.mercurievv.rss.generated",
-    sourceManaged in (Compile, scalaxb)      := (Compile / sourceManaged).value,
-    wartremoverErrors in (Compile, compile) ++= Warts.allBut(
-      Wart.Any,
-      Wart.AnyVal,
-      Wart.Nothing,
-      Wart.StringPlusAny,
-      Wart.ToString,
-      Wart.FinalCaseClass,
-      Wart.DefaultArguments,
-      Wart.Overloading
-    ),
-    wartremoverExcluded += sourceManaged.value,
-    longTest := {
-      //      scalafmtCheck.value
-      dependencyCheck.value
-      dependencyUpdates.value
-      stryker.value
-    }
-  )
-  .settings(
-    name := "jobs-crawler-core",
-    libraryDependencies ++= Seq(
-      "io.estatico"    %% "newtype"          % NewtypeVersion % Provided,
-      "org.typelevel"  %% "simulacrum"       % SimulacrumVersion % Provided,
-      "org.typelevel"  %% "cats-core"        % CatsVersion,
-      "org.typelevel"  %% "cats-effect"      % CatsEffectVersion,
-      "dev.zio"        %% "zio"              % ZIOVersion,
+    .in(file("core"))
+    .configure(defaultPlugins)
+    .settings(sharedSettings)
+    .enablePlugins(ScalaxbPlugin)
+    .settings(
+      scalaxbPackageName in (Compile, scalaxb) := "com.github.mercurievv.rss.generated",
+      //sourceManaged in (Compile, scalaxb)      := (Compile / sourceManaged).value,
+      longTest := {
+        //      scalafmtCheck.value
+        dependencyCheck.value
+        dependencyUpdates.value
+        stryker.value
+      }
+    )
+    .settings(
+      name := "jobs-crawler-core",
+      libraryDependencies ++= Seq(
+        "io.estatico" %% "newtype"                               % NewtypeVersion % Provided,
+        "org.typelevel" %% "simulacrum"                          % SimulacrumVersion % Provided,
+        "org.typelevel" %% "cats-core"                           % CatsVersion,
+        "org.typelevel" %% "cats-effect"                         % CatsEffectVersion,
+        "dev.zio" %% "zio"                                       % ZIOVersion,
+        "org.slf4j"                                              % "slf4j-simple" % "1.7.30",
+        "org.http4s" %% "http4s-dsl"                             % http4sVersion,
+        "org.http4s" %% "http4s-blaze-client"                    % http4sVersion,
+        "com.beachape" %% "enumeratum"                           % "1.5.15",
+        "com.chuusai" %% "shapeless"                             % "2.3.3",
+        "org.scanamo" %% "scanamo"                               % "1.0.0-M12-1",
+        "org.scanamo" %% "scanamo-cats-effect"                   % "1.0.0-M12-1",
+        "org.scala-lang.modules" %% "scala-parser-combinators"   % "1.1.2",
+        "dev.zio" %% "zio-interop-cats"                          % "2.0.0.0-RC12",
+        "com.github.mercurievv" %% "bulyon-lambda-http4s-fs2zio" % "1.0.12",
+        "com.github.julien-truffaut" %% "monocle-core"           % "2.0.3",
+        "com.github.julien-truffaut" %% "monocle-macro"          % "2.0.3",
+        "org.scala-lang.modules" %% "scala-xml" % "1.3.0",
 
-      "org.slf4j"                                                 % "slf4j-simple" % "1.7.30",
-      "org.http4s" %% "http4s-dsl"                                % http4sVersion,
-      "org.http4s" %% "http4s-blaze-client"                       % http4sVersion,
-      "com.beachape" %% "enumeratum"                              % "1.5.15",
-      "com.chuusai" %% "shapeless"                                % "2.3.3",
-      "org.scanamo" %% "scanamo"                                  % "1.0.0-M12-1",
-      "org.scanamo" %% "scanamo-cats-effect"                      % "1.0.0-M12-1",
-      "org.scala-lang.modules" %% "scala-parser-combinators"      % "1.1.2",
-      "dev.zio" %% "zio-interop-cats"                             % "2.0.0.0-RC12",
-      "com.github.mercurievv" %% "bulyon-lambda-http4s-fs2zio"    % "1.0.12",
-      "com.github.julien-truffaut" %% "monocle-core"              % "2.0.3",
-      "com.github.julien-truffaut" %% "monocle-macro"             % "2.0.3",
-
-
-      // For testing
-      "io.monix"       %% "minitest"         % MinitestVersion % Test,
-      "io.monix"       %% "minitest-laws"    % MinitestVersion % Test,
-      "org.scalacheck" %% "scalacheck"       % ScalaCheckVersion % Test,
-      "org.typelevel"  %% "cats-laws"        % CatsVersion % Test,
-      "org.typelevel"  %% "cats-effect-laws" % CatsEffectVersion % Test,
-      "com.github.alexarchambault" %% "scalacheck-shapeless_1.14" % "1.2.3" % Test,
-      "io.chrisdavenport" %% "cats-scalacheck"                    % "0.3.0" % Test
-    ),
-  )
-  .enablePlugins(AwsLambdaPlugin)
-  .settings(
-    // or, instead of the above, for just one function/handler
-    retrieveManaged := true,
-    lambdaName      := Some("function1"),
-    handlerName := Some(
-      "com.github.mercurievv.jobsearch.AppHandler::handleRequest"
-    ),
-    s3Bucket         := Some("mvv-lambda-jars"),
-    region           := Some("eu-west-1"),
-    awsLambdaMemory  := Some(192),
-    awsLambdaTimeout := Some(30),
-    roleArn          := Some("arn:aws:iam::173308913183:role/lambda-role")
-  )
-
+        // For testing
+        "org.scalactic" %% "scalactic"                              % "3.1.2",
+        "org.scalatest" %% "scalatest"                              % "3.1.2" % Test,
+        "org.scalatestplus" %% "scalatestplus-scalacheck"           % "3.1.0.0-RC2" % Test,
+        "io.monix" %% "minitest"                                    % MinitestVersion   % Test,
+        "io.monix" %% "minitest-laws"                               % MinitestVersion   % Test,
+        "org.scalacheck" %% "scalacheck"                            % ScalaCheckVersion % Test,
+        "org.typelevel" %% "cats-laws"                              % CatsVersion       % Test,
+        "org.typelevel" %% "cats-effect-laws"                       % CatsEffectVersion % Test,
+        "com.github.alexarchambault" %% "scalacheck-shapeless_1.14" % "1.2.3"           % Test,
+        "io.chrisdavenport" %% "cats-scalacheck"                    % "0.3.0"           % Test
+      )
+    )
+    .enablePlugins(AwsLambdaPlugin)
+    .settings(
+      // or, instead of the above, for just one function/handler
+      retrieveManaged := true,
+      lambdaName      := Some("function1"),
+      handlerName := Some(
+        "com.github.mercurievv.jobsearch.AppHandler::handleRequest"
+      ),
+      s3Bucket         := Some("mvv-lambda-jars"),
+      region           := Some("eu-west-1"),
+      awsLambdaMemory  := Some(192),
+      awsLambdaTimeout := Some(30),
+      roleArn          := Some("arn:aws:iam::173308913183:role/lambda-role")
+    )
 
 libraryDependencies += {
   "com.lihaoyi" % "ammonite" % AmmoniteVersion % "test" cross CrossVersion.full
