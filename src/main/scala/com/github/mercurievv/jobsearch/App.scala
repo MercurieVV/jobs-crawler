@@ -1,7 +1,7 @@
 package com.github.mercurievv.jobsearch
 
 import com.github.mercurievv.jobsearch.persistence.DynamodbJobsStorage
-import com.github.mercurievv.jobsearch.stackowerflow.{GetJobsFromStackowerflow, StackowerflowJobsApi}
+import com.github.mercurievv.jobsearch.remote.stackowerflow.{GetJobsFromStackowerflow, StackowerflowJobsApi}
 import org.http4s.client.blaze.BlazeClientBuilder
 import zio.ManagedApp
 import zio.blocking.Blocking

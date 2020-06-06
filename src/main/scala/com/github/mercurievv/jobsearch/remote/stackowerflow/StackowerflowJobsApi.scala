@@ -1,4 +1,4 @@
-package com.github.mercurievv.jobsearch.stackowerflow
+package com.github.mercurievv.jobsearch.remote.stackowerflow
 
 import java.nio.ByteBuffer
 

@@ -7,7 +7,7 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDBAsyncClientBuilder
 import com.github.mercurievv.jobsearch.businesslogic.{CollectJobs, JobsServer}
 import com.github.mercurievv.jobsearch.model.Job
 import com.github.mercurievv.jobsearch.persistence.DynamodbJobsStorage
-import com.github.mercurievv.jobsearch.stackowerflow.{GetJobsFromStackowerflow, StackowerflowJobsApi}
+import com.github.mercurievv.jobsearch.remote.stackowerflow.{GetJobsFromStackowerflow, StackowerflowJobsApi}
 import fs2.Stream
 import org.http4s.client.Client
 import org.http4s.client.middleware.{RequestLogger, ResponseLogger}

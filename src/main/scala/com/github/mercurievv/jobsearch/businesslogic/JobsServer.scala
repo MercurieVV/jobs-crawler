@@ -5,7 +5,7 @@ import cats._
 import cats.implicits._
 import com.github.mercurievv.jobsearch.Errorable
 import com.github.mercurievv.jobsearch.model.Job
-import com.github.mercurievv.jobsearch.stackowerflow.GetJobsFromStackowerflow
+import com.github.mercurievv.jobsearch.remote.stackowerflow.GetJobsFromStackowerflow
 import simulacrum._
 
 /**
