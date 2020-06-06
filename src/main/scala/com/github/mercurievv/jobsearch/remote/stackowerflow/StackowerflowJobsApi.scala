@@ -1,21 +1,11 @@
 package com.github.mercurievv.jobsearch.remote.stackowerflow
 
-import java.nio.ByteBuffer
-
-import cats.Monad
-import cats.data.EitherT
 import cats.effect._
+import com.github.mercurievv.http4s.coders.scalaxb.Http4sScalaxbEncodersDecoders._
 import com.github.mercurievv.jobsearch.xml.CustomXmlProtocol._
 import com.github.mercurievv.rss.generated.Rss
-import scalaxb._
-import org.http4s._
 import org.http4s.client.Client
-import org.http4s.dsl.io._
 import org.http4s.implicits._
-
-import scala.util.{Failure, Success, Try}
-import scala.xml.Node
-import com.github.mercurievv.http4s.coders.scalaxb.Http4sScalaxbEncodersDecoders._
 /**
   * Created with IntelliJ IDEA.
   * User: Victor Mercurievv
