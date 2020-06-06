@@ -18,7 +18,7 @@ class UpworkJobsApi [F[_]](httpClient: Client[F])(
   implicit
   C: ConcurrentEffect[F]) {
   def getJobsRss: F[Rss] = {
-    val target = uri"https://www.upwork.com/ab/feed/jobs/rss?q=scala&sort=recency"
+    val target = uri"https://www.upwork.com/ab/feed/jobs/rss?q=scala&sort=recency&paging=0%3B10&api_params=1&securityToken=***REMOVED***&userUid=***REMOVED***&orgUid=***REMOVED***"
     httpClient.expect[Rss](target)
   }
 }

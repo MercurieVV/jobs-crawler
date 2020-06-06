@@ -1,0 +1,247 @@
+openapi: 3.0.1
+info:
+  title: Sample API
+  description: API description in Markdown.
+  version: 1.0.0
+servers:
+  - url: 'https://api.example.com'
+paths:
+  /profiles/v2/search/jobs.{format}:
+    get:
+      summary: Returns a list of users.
+      description: Optional extended description in Markdown.
+      responses:
+        '200':
+          description: OK
+          content:
+            "application/json":
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/search_result'
+
+
+components:
+  schemas:
+    search_result:
+      type: object
+      title: The Items Schema
+      description: An explanation about the purpose of this instance.
+      default: {}
+      required:
+        - budget
+        - category2
+        - client
+        - date_created
+        - duration
+        - id
+        - job_status
+        - job_type
+        - skills
+        - snippet
+        - subcategory2
+        - title
+        - url
+        - workload
+      properties:
+        budget:
+          type: integer
+          title: The Budget Schema
+          description: An explanation about the purpose of this instance.
+          default: 0
+          example:
+            - 750
+        category2:
+          type: string
+          title: The Category2 Schema
+          description: An explanation about the purpose of this instance.
+          default: ''
+          example:
+            - Web & Mobile Development
+        date_created:
+          type: string
+          title: The Date_created Schema
+          description: An explanation about the purpose of this instance.
+          default: ''
+          example:
+            - '2014-06-30T23:50:17+0000'
+        duration:
+          type: string
+          title: The Duration Schema
+          description: An explanation about the purpose of this instance.
+          default: ''
+          example:
+            - None
+        id:
+          type: string
+          title: The Id Schema
+          description: An explanation about the purpose of this instance.
+          default: ''
+          example:
+            - "~aaa9992d99e35a386e"
+        job_status:
+          type: string
+          title: The Job_status Schema
+          description: An explanation about the purpose of this instance.
+          default: ''
+          example:
+            - Open
+        job_type:
+          type: string
+          title: The Job_type Schema
+          description: An explanation about the purpose of this instance.
+          default: ''
+          example:
+            - Fixed
+        snippet:
+          type: string
+          title: The Snippet Schema
+          description: An explanation about the purpose of this instance.
+          default: ''
+          example:
+            - Need a custom website <...>
+        subcategory2:
+          type: string
+          title: The Subcategory2 Schema
+          description: An explanation about the purpose of this instance.
+          default: ''
+          example:
+            - Web Development
+        title:
+          type: string
+          title: The Title Schema
+          description: An explanation about the purpose of this instance.
+          default: ''
+          example:
+            - Looking for highly skilled web developer
+        url:
+          type: string
+          title: The Url Schema
+          description: An explanation about the purpose of this instance.
+          default: ''
+          example:
+            - http://...
+        workload:
+          type: string
+          title: The Workload Schema
+          description: An explanation about the purpose of this instance.
+          default: ''
+          example:
+            - 30+ hrs/week
+      example:
+        - title: Looking for highly skilled web developer
+          id: "~aaa9992d99e35a386e"
+          url: http://...
+          snippet: Need a custom website <...>
+          duration: None
+          budget: 750
+          date_created: '2014-06-30T23:50:17+0000'
+          job_status: Open
+          workload: 30+ hrs/week
+          subcategory2: Web Development
+          client:
+            past_hires: 0
+            feedback: 0
+            payment_verification_status: None
+            country: None
+            reviews_count: 0
+            jobs_posted: 1
+          category2: Web & Mobile Development
+          skills:
+            - css
+            - css3
+            - database-design
+            - database-programming
+            - english
+            - html
+            - javascript
+            - mysql
+            - php
+            - python
+          job_type: Fixed
+
+
+
+    client:
+      type: object
+      title: The Client Schema
+      description: An explanation about the purpose of this instance.
+      default: {}
+      example:
+        - jobs_posted: 1
+          past_hires: 0
+          feedback: 0
+          payment_verification_status: None
+          country: None
+          reviews_count: 0
+      required:
+        - country
+        - feedback
+        - jobs_posted
+        - past_hires
+        - payment_verification_status
+        - reviews_count
+      properties:
+        country:
+          type: string
+          title: The Country Schema
+          description: An explanation about the purpose of this instance.
+          default: ''
+          example:
+            - None
+        feedback:
+          type: integer
+          title: The Feedback Schema
+          description: An explanation about the purpose of this instance.
+          default: 0
+          example:
+            - 0
+        jobs_posted:
+          type: integer
+          title: The Jobs_posted Schema
+          description: An explanation about the purpose of this instance.
+          default: 0
+          example:
+            - 1
+        past_hires:
+          type: integer
+          title: The Past_hires Schema
+          description: An explanation about the purpose of this instance.
+          default: 0
+          example:
+            - 0
+        payment_verification_status:
+          type: string
+          title: The Payment_verification_status Schema
+          description: An explanation about the purpose of this instance.
+          default: ''
+          example:
+            - None
+        reviews_count:
+          type: integer
+          title: The Reviews_count Schema
+          description: An explanation about the purpose of this instance.
+          default: 0
+          example:
+            - 0
+    skills:
+      type: array
+      title: The Skills Schema
+      description: An explanation about the purpose of this instance.
+      default: []
+      items:
+        type: string
+        title: The Items Schema
+        description: An explanation about the purpose of this instance.
+        default: ''
+        example:
+          - css
+          - css3
+          - database-design
+          - database-programming
+          - english
+          - html
+          - javascript
+          - mysql
+          - php
+          - python
