@@ -15,8 +15,17 @@ lazy val root = (project in file("."))
   .enablePlugins(ScalaxbPlugin)
   .settings(
     scalaxbPackageName in (Compile, scalaxb) := "com.github.mercurievv.rss.generated",
-    sourceManaged in (Compile, scalaxb) := (Compile / sourceManaged).value,
-    wartremoverErrors in (Compile, compile) ++= Warts.allBut(Wart.Any, Wart.AnyVal, Wart.Nothing, Wart.StringPlusAny, Wart.ToString, Wart.FinalCaseClass),
+    sourceManaged in (Compile, scalaxb)      := (Compile / sourceManaged).value,
+    wartremoverErrors in (Compile, compile) ++= Warts.allBut(
+      Wart.Any,
+      Wart.AnyVal,
+      Wart.Nothing,
+      Wart.StringPlusAny,
+      Wart.ToString,
+      Wart.FinalCaseClass,
+      Wart.DefaultArguments,
+      Wart.Overloading
+    ),
     wartremoverExcluded += sourceManaged.value,
     longTest := {
 //      scalafmtCheck.value
