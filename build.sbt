@@ -114,9 +114,11 @@ lazy val sharedSettings = Seq(
   }),
   // Turning off fatal warnings for doc generation
   scalacOptions.in(Compile) ~= { options: Seq[String] =>
-  options.filterNot(Set(
-    "-Xlint:package-object-classes"
-  ))},
+    options.filterNot(Set(
+      "-Xlint:package-object-classes",
+      "-Wunused:nowarn"
+    ))
+  },
   scalacOptions.in(Compile, doc) ~= filterConsoleScalacOptions,
   // Silence all warnings from src_managed files
   scalacOptions += "-P:silencer:pathFilters=.*[/]src_managed[/].*",
